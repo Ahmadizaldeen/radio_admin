@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MY RADIO</title>
+    <style>
+        .rp-player{
+            width :400px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        .rp-logo{
+            width: 200px;
+        }
+        .rp-genre-button,
+        .rp-station-button{
+            margin: 5px;
+            padding: 8px 10px;
+            border: none;
+            background-color: #707070;
+            border-radius: 5px;
+            color :white;
+            cursor: pointer;
+        }
+        .rp-station-button{
+            
+            background-color: #453636;
+            
+        }
+
+        .rp-current-logo{
+            display: block;
+            width: 80px;
+            margin: 0 auto 15px;
+            text-align: center;
+            
+        }
+
+    </style>
+  </head>
+  <body>
+    <div class="rp-player">
+      <h3>Mein Radio</h3>
+      <!--App Logo -->
+      <img class="rp-logo" src="" alt="logo" />
+
+      <!--genre anzeigen-->
+
+      <p>Gerne auswählen</p>
+      <div class="rp-genres">
+        <!--Genres Buttons-->
+      </div>
+      <!-- aktulle sender zeigen-->
+      <p><strong class="rp-current-station"></strong></p>
+      <img id="rp-current-logo" class="rp-current-logo" src="" alt="logo" />
+
+      <!--Audio Player-->
+      <audio src="#" id="rp-audio-player" controls></audio>
+
+      <!--Sender Liste-->
+      <div class="rp-stations">
+        
+      </div>
+    </div>
+    <script>
+      const url = "http://localhost/my_radio/"; // projekt url
+      
+      const rpLogo = document.querySelector(".rp-logo");
+      const rpGenre = document.querySelector(".rp-genres");
+      const rpCurrentStation = document.querySelector(".rp-current-station");
+      const rpCurrentLogo = document.querySelector("#rp-current-logo");
+      const rpAudioPlayer = document.querySelector("#rp-audio-player");
+      const rpStations = document.querySelector(".rp-stations");
+      //console.log(rpLogo, rpGenre, rpCurrentStation, rpCurrentLogo, rpAudioPlayer, rpStations);
+
+      let genres = [];
+      let stations = [];
+        rpAudioPlayer.volume =0.1;
+      //logo setzen
+      rpLogo.src = url+"logco.jpg";
+      
+      async function LoadGenreAndStation() {
+        const genreResponse = await fetch(url + "radio_json/get_genres.php");
+        genres = await genreResponse.json();
+        //console.log(genres);
+
+        const stationResponse = await fetch(url + "radio_json/get_stations.php");
+        stations = await stationResponse.json();
+        //console.log(stations);
+        genres.forEach((genre) => {
+        //console.log(gerne['name']);
+        let button = document.createElement("button"); //<button></button>
+        button.className = "rp-genre-button"; //<button class="rp-genre-button"></button>"
+        button.textContent = genre.name;
+
+        button.addEventListener("click", function () {
+          //alert(genre.id);
+          rpStations.innerHTML =""; //refresh 
+          stations.forEach(function (station) {
+            if(station.genre_id == genre.id){
+                let stationButton = document.createElement("button");
+                stationButton.className = "rp-station-button";
+                stationButton.textContent = station.name; //<button class ="rp-station-button>Station Name</button>"
+
+                //button src = stream_url
+                stationButton.addEventListener("click" , function(){
+                    //alert()
+                    rpAudioPlayer.src = station.stream_url;
+                    rpAudioPlayer.play();
+
+                    rpCurrentStation.textContent = "Jetzt läuft: "+ station.name;
+                    rpCurrentLogo.src = station.logo;
+                })
+                rpStations.appendChild(stationButton);
+            }
+            //console.log(station.name);
+        
+            
+          });
+        });
+
+        rpGenre.appendChild(button);
+    });
+}
+    LoadGenreAndStation();
+    </script>
+  </body>
+</html>
