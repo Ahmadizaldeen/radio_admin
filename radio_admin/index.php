@@ -18,7 +18,7 @@ switch ($page) {
         require_once "views/genre_form.php";
         require_once "views/genre_table.php";
 
-        if($action === "add"  & $_SERVER['REQUEST_METHOD'] === "POST"){
+        if($action === "add"  && $_SERVER['REQUEST_METHOD'] === "POST"){ //neue Daten in POST body # GET ->page , POST->action.
             $genreObj->insert($_POST['name']);
             header ("Location: index.php?page=genre");
             exit;
